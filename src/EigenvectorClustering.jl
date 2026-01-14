@@ -5,6 +5,7 @@ export clusterize,
        EigenvectorClusteringResult
 
 using Clustering
+using Random: MersenneTwister, GLOBAL_RNG
 
 
 import Clustering.assignments
@@ -28,14 +29,33 @@ struct KMeansClusterizer <: EigenvectorClusterizer
     k::Integer
     init::Symbol
     maxiter::Integer
+    ninit::Integer
 end
 function KMeansClusterizer(k::Integer)
-    return KMeansClusterizer(k, :kmpp, 50000)
+    return KMeansClusterizer(k, :kmpp, 50000, 1)
 end
 function clusterize(t::KMeansClusterizer, E)
-    model = kmeans(Matrix(E'), t.k, init =t.init, maxiter=t.maxiter)
+    best_assignments = nothing
+    best_inertia = Inf
 
-    return EigenvectorClusteringResult(assignments(model))
+    for _ in 1:t.ninit
+        result = kmeans(
+            Matrix(E'), 
+            t.k,
+            init = t.init, 
+            maxiter = t.maxiter,
+            rng=MersenneTwister(rand(GLOBAL_RNG, 1:typemax(Int)))
+        )
+
+        inertia =  result.totalcost
+        
+        if inertia < best_inertia
+            best_inertia = inertia
+            best_assignments = result.assignments
+        end
+    end
+
+    return EigenvectorClusteringResult(best_assignments)
 end
 
 """
