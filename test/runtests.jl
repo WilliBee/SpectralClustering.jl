@@ -167,11 +167,11 @@ end
         emb_2 = embedding(PartialGroupingConstraints(1, smooth=true),  graph, constraints)
         labels_2 = vcat(zeros(Integer, N), ones(Integer, N * 2))
 
-        pred_clustering = convert(Array{Int64}, (emb_1 .<= mean(emb_1)))
+        pred_clustering = dropdims(emb_1 .<= mean(emb_1), dims=2)
         @test randindex(pred_clustering, labels_1)[4] > 0.85
         @test randindex(pred_clustering, labels_2)[4] < 0.5
 
-        pred_clustering = convert(Array{Int64}, (emb_2 .<= mean(emb_2)))
+        pred_clustering = dropdims(emb_2 .<= mean(emb_2), dims=2)
         @test randindex(pred_clustering, labels_2)[4] > 0.85
         @test randindex(pred_clustering, labels_1)[4] < 0.5
     end
@@ -303,7 +303,7 @@ end
             (data, labels) = two_gaussians(6000)
             embedding_config = NystromMethod(EvenlySpacedLandmarkSelection(), 1000, weight, 1)
             emb = embedding(embedding_config, data)
-            pred_clustering = convert(Array{Int64}, (emb .<= mean(emb)))
+            pred_clustering = dropdims((emb .<= mean(emb)), dims=2)
             @test randindex(pred_clustering, labels)[4] > 0.85
         end
         @testset "Image embedding" begin
