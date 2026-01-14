@@ -7,6 +7,7 @@ export embedding,
 using Graphs
 using Graphs.LinAlg
 using ArnoldiMethod
+using ArnoldiMethod: LM, SR
 using LinearAlgebra
 using Arpack
 abstract type AbstractEmbedding <: EigenvectorEmbedder

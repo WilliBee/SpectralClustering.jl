@@ -11,6 +11,7 @@ using Graphs
 using Graphs.LinAlg
 using SparseArrays
 using ArnoldiMethod
+using ArnoldiMethod: SR
 
 
 import Graphs.LinAlg:adjacency_matrix
