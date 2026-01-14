@@ -142,11 +142,10 @@ function create_A_B(cfg::NystromMethod, landmarks::Vector{<:Integer}, X)
         A[:,j] = cfg.w(landmarks[j], landmarks, view(landmarks_m, :, j), landmarks_m)
     end
 
-    vec_k = zeros(Float32, length(get_element(X, 1)), Threads.nthreads())
     Threads.@threads for k = 1:length(indexes_b)
-       thread_id = Threads.threadid()
-       get_element!(view(vec_k, :, thread_id), X, indexes_b[k])
-       B[:,k] = cfg.w(indexes_b[k], landmarks, view(vec_k, :, thread_id), landmarks_m)
+        vec_k = zeros(Float32, length(get_element(X, 1)))
+       get_element!(vec_k, X, indexes_b[k])
+       B[:,k] = cfg.w(indexes_b[k], landmarks, vec_k, landmarks_m)
     end
     return (A, B)
 end
